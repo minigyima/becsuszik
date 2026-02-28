@@ -23,6 +23,22 @@ export default function AppTabs() {
                     renderingMode="template"
                 />
             </NativeTabs.Trigger>
+
+            <NativeTabs.Trigger name="motion-demo">
+                <NativeTabs.Trigger.Label>Motion</NativeTabs.Trigger.Label>
+                <NativeTabs.Trigger.Icon
+                    src={require('@/assets/images/tabIcons/explore.png')}
+                    renderingMode="template"
+                />
+            </NativeTabs.Trigger>
+
+            <NativeTabs.Trigger name="drag-demo">
+                <NativeTabs.Trigger.Label>Drag μ</NativeTabs.Trigger.Label>
+                <NativeTabs.Trigger.Icon
+                    src={require('@/assets/images/tabIcons/explore.png')}
+                    renderingMode="template"
+                />
+            </NativeTabs.Trigger>
         </NativeTabs>
     );
 }

@@ -1,8 +1,3 @@
-/**
- * Learn more about light and dark modes:
- * https://docs.expo.dev/guides/color-schemes/
- */
-
 import { Color } from 'expo-router';
 import { Platform } from 'react-native';
 
@@ -20,6 +15,7 @@ export function useTheme() {
             backgroundElement: Color.android.dynamic.surfaceContainer,
             backgroundSelected: Color.android.dynamic.secondaryContainer,
             textSecondary: Color.android.dynamic.onSurfaceVariant,
+            motionRipple: Color.android.dynamic.primary,
         };
     }
 
@@ -30,6 +26,7 @@ export function useTheme() {
             backgroundElement: Color.ios.secondarySystemBackground,
             backgroundSelected: Color.ios.tertiarySystemFill,
             textSecondary: Color.ios.secondaryLabel,
+            motionRipple: Color.ios.systemBlue,
         };
     }
 
