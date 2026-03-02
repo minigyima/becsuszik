@@ -102,7 +102,7 @@ export function useMotionCalibration(options: UseMotionCalibrationOptions = {}):
     const [state, setState] = useState<CalibrationState>({
         isAvailable: false,
         isStill: false,
-        isCalibrating: true,
+        isCalibrating: false,
         isCalibrated: false,
         progress: 0,
         gravityX: 0,
@@ -181,6 +181,27 @@ export function useMotionCalibration(options: UseMotionCalibrationOptions = {}):
     );
 
     useDerivedValue(() => {
+        if (!motion.isAvailable) { // If sensors are unavailable don't start calibration
+            isStillSv.value = false;
+            isCalibratingSv.value = false;
+            progressSv.value = 0;
+            
+            if (!hasPublished.value || lastPublishedStill.value !== false) { // Notify js side
+                hasPublished.value = true;
+                lastPublishMs.value = tickMs.value;
+                lastPublishedStill.value = false;
+
+                scheduleOnRN(
+                    publishState,
+                    false, // isStill
+                    false, // isCalibrating
+                    isCalibratedSv.value,
+                    0,     // progress
+                    0, 0, 0, 0, 0, 0, 0, 0 //data
+                );
+            }
+            return; 
+        }
         const dt = motion.interval.value > 0 ? motion.interval.value : updateInterval;
         tickMs.value += dt;
 
@@ -292,6 +313,7 @@ export function useMotionCalibration(options: UseMotionCalibrationOptions = {}):
             );
         }
     }, [
+        motion.isAvailable,
         calibrationDurationMs,
         motion.accelerationWithGravityX,
         motion.accelerationWithGravityY,
