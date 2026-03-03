@@ -93,8 +93,8 @@ export function useMotionCalibration(options: UseMotionCalibrationOptions = {}):
         minSampleCount = 450,
         publishIntervalMs = 120,
         smoothingFactor = 0.18,
-        stillnessRotationRateThreshold = 0.3,
-        stillnessGravityDeltaThreshold = 0.6,
+        stillnessRotationRateThreshold = 0.4,
+        stillnessGravityDeltaThreshold = 0.8,
     } = options;
 
     const motion = useMotion({ updateInterval });
