@@ -1,0 +1,25 @@
+services:
+    postgres:
+        image: postgres:18-alpine
+        restart: on-failure
+        hostname: becsuszik-postgres
+        ports:
+            - 127.0.0.1:5433:5432
+        networks:
+            becsuszik:
+                ipv4_address: 172.128.4.3
+        volumes:
+            - './data/postgres/data:/var/lib/postgresql/data:z'
+            - './data/root:/root:z'
+            - './data/log:/var/log:z'
+        environment:
+            POSTGRES_USER: becsuszik
+            POSTGRES_PASSWORD: becsuszik
+            POSTGRES_DB: becsuszik
+
+networks:
+    becsuszik:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: 172.128.0.0/16
