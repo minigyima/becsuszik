@@ -1,5 +1,6 @@
 import Head from "next/head";
-import { useState, CSSProperties } from "react";
+import { useState, useEffect, CSSProperties } from "react";
+import { QRCodeSVG } from "qrcode.react";
 
 // oldal tipusok
 type Page = "calculator" | "share" | "settings" | "login";
@@ -89,6 +90,7 @@ const Icons = {
   email: icon("M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zM22 6l-10 7L2 6", 20),
   lock: icon("M3 11h18v11a2 2 0 01-2 2H5a2 2 0 01-2-2V11zM7 11V7a5 5 0 0110 0v4", 20),
   user: icon("M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 7a4 4 0 100-8 4 4 0 000 8", 20),
+
   // google es apple :3
   google: (
     <svg width="20" height="20" viewBox="0 0 24 24">
@@ -107,13 +109,15 @@ const Icons = {
 
 // ==================== MERESI MEZOK ====================
 // TODO: ezek a telorol jonnek majd
+// opcionalis: ha pont azt az adatot szamoljuk / ha eszleli hogy elkezdodott a meres,
+// akkor a value-be lehet tenni loopolva "." ".." "..." ilyen kis loading style cuccost
 const fields = [
-  { label: "Gravitációs állandó (m/s²)", value: "9.81" },
-  { label: "Tömeg (g)", ph: "Adja meg a tömeget" },
-  { label: "Kezdősebesség (m/s)", ph: "Adja meg a kezdősebességet" },
-  { label: "Végsebesség (m/s)", ph: "Adja meg a végsebességet" },
-  { label: "Távolság (m)", ph: "Adja meg a távolságot" },
-  { label: "Idő (s)", ph: "Adja meg az időt" },
+  { label: "Gravitációs állandó (m/s²)", value: "9.81", editable: true },
+  { label: "Tömeg (g)", value: "", editable: false },
+  { label: "Kezdősebesség (m/s)", value: "", editable: false },
+  { label: "Végsebesség (m/s)", value: "", editable: false },
+  { label: "Távolság (m)", value: "", editable: false },
+  { label: "Idő (s)", value: "", editable: false },
 ];
 
 // nav menu konfiguracio ||| uj menupontot ide kell rakni
@@ -164,6 +168,7 @@ const Toggle = ({
 
 // ==================== MAIN KOMPONENS ====================
 export default function Home() {
+
   // -------- ALLAPOTOK --------        
   const [page, setPage] = useState<Page>("calculator");         // melyik oldal aktiv
   const [hc, setHc] = useState(false);                          // magas kontraszt mod
@@ -173,6 +178,14 @@ export default function Home() {
   const [password, setPassword] = useState("");                 // jelszo input
   const [name, setName] = useState("");                         // nev input
   const [navHover, setNavHover] = useState<Page | null>(null);  // melyik nav gombra hoverelunk
+
+  const [shareCode, setShareCode] = useState("");               // random 6 jegyu sex kod
+
+  // random gen
+  useEffect(() => {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    setShareCode(code);
+  }, []);
 
   // -------- TEMA KIVALASZTASA --------
   // hc > light > dark sorrendben nezi melyik aktiv
@@ -298,7 +311,13 @@ export default function Home() {
       </Head>
 
       {/* ========== FO CONTAINER ========== */}
-      <div style={{ ...box(t.bg), minHeight: "100vh" }}>
+      <div style={{
+        ...box(t.bg),
+        height: "100vh",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column"
+        }}>
 
         {/* ---------- NAVBAR ---------- */}
         {/* navbar blur effekttel, eleg sexy */}
@@ -367,55 +386,95 @@ export default function Home() {
 
         {/* ---------- OLDAL TARTALOM ---------- */}
         {/* settings oldalnal kisebb maxWidth mert ugy szebb */}
-        <div style={{ padding: 16, maxWidth: page === "settings" ? 600 : 1400, margin: "0 auto" }}>
+        <div style={{
+          padding: page === "settings" ? "16px 2vw" : "1vh 1.5vw",
+          maxWidth: page === "settings" ? 600 : "none",
+          margin: "0 auto",
+          flex: 1,
+          overflow: "hidden" }}>
 
           {/* ========== MERES OLDAL ========== */}
           {page === "calculator" && (
-            <div style={box(t.bgDark, 24)}>
+            <div style={{
+              ...box(t.bgDark, 24),
+              height: "100%",
+              display: "flex",
+              flexDirection: "column" }}>
 
               {/* 2 oszlopos layout: bal = inputok, jobb = grafikonok */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 24 }}>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 3fr",
+                gap: 24,
+                flex: 1 
+                }}>
 
                 {/* ------- BAL PANEL - MERESI ADATOK ------- */}
-                <div style={box(t.sec)}>
-                  <h3 style={{ ...text(20, true), marginBottom: 16 }}>
+                <div style={{
+                  ...box(t.sec),
+                  display: "flex",
+                  flexDirection: "column" 
+                  }}>
+                  <h3 style={{ ...text(20, true), marginBottom: "1.2vh" }}>
                     Mérési adatok
                   </h3>
 
-                  {/* input mezok - TODO: kesobb ezek a telefonrol jonnek */}
+                  {
+                  /* input/text mezok*/
+                  /* TODO: kesobb ezek a telefonrol jonnek */
+                  }
                   {fields.map((f, i) => (
-                    <div key={i} style={{ marginBottom: 16 }}>
-                      <label style={{ display: "block", fontSize: 14, color: t.txt, marginBottom: 4 }}>
+                    <div key={i} style={{ marginBottom: "1.5vh" }}>
+                      <label style={{ display: "block", fontSize: "clamp(14px, 1.5vw, 18px)", color: t.txt, marginBottom: "0.5vh" }}>
                         {f.label}
                       </label>
-                      <input
-                        type="number"
-                        defaultValue={f.value}
-                        placeholder={f.ph}
-                        style={{
+                      {f.editable ? (
+                        <input
+                          type="number"
+                          defaultValue={f.value}
+                          style={{
+                            width: "100%",
+                            ...box(t.bg, 0, 8),
+                            paddingLeft: 12,
+                            paddingRight: 12,
+                            height: 44,
+                            color: "#fff",
+                            border: `1px solid ${t.txt}`,
+                            fontSize: "clamp(16px, 1.5vw, 20px)",
+                          }}
+                        />
+                      ) : (
+                        <div style={{
                           width: "100%",
-                          ...box(t.bg, 12, 8),
+                          ...box(t.bg, 0, 8),
+                          paddingLeft: 12,
+                          paddingRight: 12,
+                          height: 44,
+                          display: "flex",
+                          alignItems: "center",
                           color: "#fff",
-                          border: `1px solid ${t.txt}`,
-                          fontSize: 16,
-                        }}
-                      />
+                          border: `1px solid ${t.sec}`,
+                          fontSize: "clamp(16px, 1.5vw, 20px)",
+                        }}>
+                          {f.value}
+                        </div>
+                      )}
                     </div>
                   ))}
 
                   {/* nagy kiemelt doboz a vegeredmenynek */}
                   <div style={{
-                    ...box(`${t.pri}33`, 20),
+                    ...box(`${t.pri}33`, 16),
                     border: `2px solid ${t.pri}`,
-                    marginTop: 16,
+                    marginTop: "auto",
                   }}>
-                    <p style={{ fontSize: 14, color: t.txt }}>Súrlódási együttható</p>
-                    <p style={{ ...text(40, true), color: t.pri }}>0.425</p>
+                    <p style={{ fontSize: "clamp(12px, 1.2vw, 16px)", color: t.txt }}>Súrlódási együttható</p>
+                    <p style={{ fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: "bold", color: t.pri }}>0.425</p>
                   </div>
                 </div>
 
                 {/* ------- JOBB PANEL - GRAFIKONOK ------- */}
-                <div style={{ ...flex(16, "column"), height: "100%" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 16, height: "100%" }}>
                   {[
                     { n: "Sebesség", v: "120 m/s" },
                     { n: "Gyorsulás", v: "5.000 m/s²" },
@@ -429,8 +488,8 @@ export default function Home() {
                         <span style={{ ...text(24, true), color: t.pri }}>{c.v}</span>
                       </div>
 
-                      {/* TODO: ide jon majd a grafikon komponens */}
-                      <div style={{ ...box(t.bg), flex: 1, minHeight: 150 }} />
+                      {/* TODO: ide jon majd a grafikon */}
+                      <div style={{ ...box(t.bg), flex: 1 }} />
 
                     </div>
                   ))}
@@ -449,20 +508,20 @@ export default function Home() {
               gridTemplateColumns: "1fr 1fr",
               gap: 48,
               alignItems: "center",
+              minHeight: "calc(100vh - 90px)",
             }}>
 
-              {/* QR kod placeholder - TODO: igazi qr kod generalas */}
-              <div style={{ ...box("#fff", 24, 16), border: `4px solid ${t.pri}` }}>
-                <div style={{
-                  aspectRatio: "1",
-                  ...box("#e5e7eb"),
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: t.txt,
-                }}>
-                  QR Code
-                </div>
+              {/* QR kod*/}
+              <div style={{ ...box("#fff", 24, 16), border: `4px solid ${t.pri}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {shareCode && (
+                  <QRCodeSVG
+                    value={shareCode}
+                    size={280}
+                    level="H"
+                    bgColor="#ffffff"
+                    fgColor="#000000"
+                  />
+                )}
               </div>
 
               <div style={{ textAlign: "center" }}>
@@ -470,9 +529,9 @@ export default function Home() {
                   Kérjük scannelje be a QR kódot, vagy írja be a következő számot
                 </h2>
 
-                {/* parosito kod - placeholder */}
+                {/* Link code, XXX-XXX formatum */}
                 <div style={{ ...box(t.bg, 16), display: "inline-flex", alignItems: "center", gap: 8 }}>
-                  {["6", "7", "6", "-", "7", "6", "7"].map((d, i) => 
+                  {shareCode && [...shareCode.slice(0, 3), "-", ...shareCode.slice(3)].map((d, i) =>
                     d === "-" ? (
                       <span key={i} style={{ ...text(28, true), color: t.txt, margin: "0 8px" }}>-</span>
                     ) : (
